@@ -70,6 +70,7 @@ public:
 // Statement
 // ---------------------------------
 class Statement {
+    friend class DBConnect;
     sqlite3_stmt* stmt_ = nullptr;
 
 public:
@@ -180,6 +181,155 @@ inline std::vector<std::string> Statement::column<std::string>(int colIndex) {
     while(step()) res.push_back(getText(colIndex));
     reset();
     return res;
+}
+
+// ---------------------------------
+// PHP-like API (compatible with old sl_sqlite3 interface)
+// ---------------------------------
+
+// SQLRow: map of column name -> string value (like old API)
+using SQLRow = std::unordered_map<std::string, std::string>;
+
+// SQLResults: holds query results in PHP-like format
+class SQLResults {
+public:
+    SQLResults() : num_fields(0), num_rows(0), num_tuples(0) {}
+    
+    void clear() {
+        results.clear();
+        num_fields = 0;
+        num_rows = 0;
+        num_tuples = 0;
+        error_message.clear();
+        row_iterator = results.begin();
+    }
+    
+    size_t size() const { return results.size(); }
+    
+    std::vector<SQLRow> results;
+    std::vector<SQLRow>::iterator row_iterator;
+    size_t num_fields;
+    size_t num_rows;
+    size_t num_tuples;
+    std::string error_message;
+};
+
+// DBConnect: PHP-like interface wrapper around Database
+class DBConnect {
+private:
+    std::unique_ptr<Database> db_;
+    
+    void executeQuery(SQLResults* results, const std::string& sql) {
+        try {
+            results->clear();
+            auto stmt = db_->prepare(sql);
+            
+            // Get column count
+            int column_count = sqlite3_column_count(stmt->stmt_);
+            
+            // Fetch all rows
+            while (stmt->step()) {
+                SQLRow row;
+                for (int i = 0; i < column_count; i++) {
+                    const char* col_name = sqlite3_column_name(stmt->stmt_, i);
+                    const char* col_text = reinterpret_cast<const char*>(
+                        sqlite3_column_text(stmt->stmt_, i)
+                    );
+                    row[col_name ? col_name : ""] = col_text ? col_text : "";
+                }
+                results->results.push_back(row);
+            }
+            
+            results->num_rows = results->results.size();
+            results->num_fields = column_count;
+            results->num_tuples = results->num_rows;
+            results->row_iterator = results->results.begin();
+            
+        } catch (const SQLiteException& e) {
+            results->error_message = e.what();
+            results->num_rows = 0;
+            results->num_fields = 0;
+        }
+    }
+    
+public:
+    DBConnect() {}
+    explicit DBConnect(const std::string& filename) {
+        db_ = std::make_unique<Database>(filename);
+    }
+    
+    virtual ~DBConnect() {}
+    
+    // Initialize/open database
+    void open(const std::string& filename) {
+        db_ = std::make_unique<Database>(filename);
+    }
+    
+    // Query with results (PHP-like)
+    void query(SQLResults* results, const std::string& sql) {
+        executeQuery(results, sql);
+    }
+    
+    void query(SQLResults* results, const char* sql) {
+        executeQuery(results, std::string(sql));
+    }
+    
+    // Query without results (for INSERT, UPDATE, DELETE)
+    void query(const std::string& sql) {
+        try {
+            db_->execute(sql);
+        } catch (const SQLiteException& e) {
+            std::cerr << "Query error: " << e.what() << std::endl;
+        }
+    }
+    
+    void query(const char* sql) {
+        query(std::string(sql));
+    }
+    
+    // Fetch next row from results (PHP-like mysql_fetch_array)
+    bool fetch_array(SQLResults* results, SQLRow* row) {
+        if (results->num_rows == 0)
+            return false;
+        
+        if (results->row_iterator != results->results.end()) {
+            *row = *results->row_iterator;
+            results->row_iterator++;
+            return true;
+        }
+        return false;
+    }
+    
+    // Get last inserted row ID
+    int64_t last_rowid() {
+        if (!db_) return 0;
+        return sqlite3_last_insert_rowid(db_->get());
+    }
+    
+    // Check if table exists
+    bool does_table_exist(const std::string& table_name) {
+        SQLResults results;
+        std::string sql = "SELECT name FROM sqlite_master WHERE type='table' AND name='" + table_name + "';";
+        query(&results, sql);
+        return results.num_rows > 0;
+    }
+    
+    // Get underlying Database object for advanced operations
+    Database* getDatabase() { return db_.get(); }
+};
+
+// SQL escape functions (like old API)
+inline std::string sql_escape(const std::string& src) {
+    std::string result;
+    result.reserve(src.length() * 2);
+    for (char c : src) {
+        if (c == '\'') {
+            result += "''";
+        } else {
+            result += c;
+        }
+    }
+    return result;
 }
 
 } // namespace rdb

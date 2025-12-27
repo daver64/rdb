@@ -5,7 +5,9 @@
 *.out
 *.app
 example
-
+old_api/
+example_phplike
+demo_complete
 # SQLite database files
 *.db
 *.sqlite
