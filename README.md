@@ -49,7 +49,32 @@ MySQLDBConnect mysql("localhost", "app", "secret", "mydata", 3306);
 MariaDBDBConnect mariadb("localhost", "app", "secret", "mydata", 3306);
 ```
 
-Compile PostgreSQL code with `-DRDB_ENABLE_POSTGRESQL` and `-lpq`. Compile MySQL or MariaDB code with `-DRDB_ENABLE_MYSQL` and the flags supplied by that installation's `mysql_config` or `mariadb_config`. These adapters implement the PHP-like `query`, `fetch_array`, `last_rowid`, and `does_table_exist` API. The modern `Database`/`Statement` API remains SQLite-specific for now.
+Compile PostgreSQL code with `-DRDB_ENABLE_POSTGRESQL` and `-lpq`. Compile MySQL or MariaDB code with `-DRDB_ENABLE_MYSQL` and the flags supplied by that installation's `mysql_config` or `mariadb_config`. These adapters implement the PHP-like `query`, `fetch_array`, `last_rowid`, and `does_table_exist` API. The unified modern API below provides prepared statements and transactions across all three backends.
+
+### Unified Modern API
+
+For prepared statements and transactions across all supported databases, include `include/rdb_unified.h`:
+
+```cpp
+std::unique_ptr<rdb::IDatabase> db = rdb::makeSQLiteDatabase("app.db");
+// Or: rdb::makePostgreSQLDatabase("host=localhost dbname=app user=app");
+// Or: rdb::makeMariaDBDatabase("localhost", "app", "secret", "app", 3306);
+
+db->execute("CREATE TABLE users (id INTEGER, name TEXT)");
+auto statement = db->prepare("SELECT id, name FROM users WHERE id = ?");
+statement->bind(1, 1);
+statement->forEachRow([](rdb::IStatement& row) {
+    std::cout << row.getInt(0) << ": " << row.getText(1) << "\n";
+});
+
+{
+    rdb::IDatabase::Transaction transaction(*db);
+    // prepared INSERT/UPDATE statements...
+    transaction.commit();
+}
+```
+
+The unified API uses 1-based positional parameters and native prepared statements for SQLite, PostgreSQL, and MySQL/MariaDB. Use `?` placeholders in portable SQL. PostgreSQL and MySQL/MariaDB support must be enabled at compile time with `RDB_ENABLE_POSTGRESQL` and/or `RDB_ENABLE_MYSQL`; SQLite is always available when linked with SQLite3.
 
 ## Quick Start
 
