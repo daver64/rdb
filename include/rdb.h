@@ -153,7 +153,7 @@ public:
 // Database::prepare
 // ---------------------------------
 inline std::unique_ptr<Statement> Database::prepare(const std::string& sql) {
-    return std::make_unique<Statement>(db_, sql);
+    return std::unique_ptr<Statement>(new Statement(db_, sql));
 }
 
 // ---------------------------------
@@ -255,14 +255,14 @@ private:
 public:
     DBConnect() {}
     explicit DBConnect(const std::string& filename) {
-        db_ = std::make_unique<Database>(filename);
+        db_.reset(new Database(filename));
     }
     
     virtual ~DBConnect() {}
     
     // Initialize/open database
     void open(const std::string& filename) {
-        db_ = std::make_unique<Database>(filename);
+        db_.reset(new Database(filename));
     }
     
     // Query with results (PHP-like)

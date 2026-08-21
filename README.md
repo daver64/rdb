@@ -1,6 +1,6 @@
 # rdb
 
-A modern, lightweight C++ wrapper for SQLite3 with **two complementary APIs**:
+A modern, lightweight C++ wrapper for SQLite3 with optional PostgreSQL and MySQL/MariaDB adapters:
 - **PHP-like API**: Simple, familiar interface inspired by PHP's database functions
 - **Modern C++ API**: RAII semantics with type-safe operations
 
@@ -15,11 +15,13 @@ A modern, lightweight C++ wrapper for SQLite3 with **two complementary APIs**:
 - **Type-Safe Results**: Generic row mapping with lambda support (modern API)
 - **Modern C++**: Move semantics, smart pointers, and functional programming patterns
 - **Header-Only**: Single-header library for easy integration
+- **Optional SQL drivers**: PostgreSQL and MySQL/MariaDB adapters with the same PHP-like result API
 
 ## Requirements
 
 - C++11 or later
 - SQLite3 library
+- Optional: PostgreSQL `libpq` or MySQL/MariaDB Connector/C
 
 ## Installation
 
@@ -33,6 +35,21 @@ Link against SQLite3:
 ```bash
 g++ -o example example.cpp -lsqlite3
 ```
+
+## PostgreSQL and MySQL/MariaDB
+
+Include the optional driver header when using a server database:
+
+```cpp
+#include "include/rdb_drivers.h"
+using namespace rdb;
+
+PostgreSQLDBConnect postgres("host=localhost dbname=mydata user=app password=secret");
+MySQLDBConnect mysql("localhost", "app", "secret", "mydata", 3306);
+MariaDBDBConnect mariadb("localhost", "app", "secret", "mydata", 3306);
+```
+
+Compile PostgreSQL code with `-DRDB_ENABLE_POSTGRESQL` and `-lpq`. Compile MySQL or MariaDB code with `-DRDB_ENABLE_MYSQL` and the flags supplied by that installation's `mysql_config` or `mariadb_config`. These adapters implement the PHP-like `query`, `fetch_array`, `last_rowid`, and `does_table_exist` API. The modern `Database`/`Statement` API remains SQLite-specific for now.
 
 ## Quick Start
 
