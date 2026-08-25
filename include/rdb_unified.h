@@ -10,6 +10,11 @@
 #include <vector>
 #include <functional>
 
+/**
+ * @file rdb_unified.h
+ * @brief Backend-independent database interfaces for SQLite, PostgreSQL, and MySQL.
+ */
+
 #if defined(RDB_ENABLE_POSTGRESQL)
 #include <libpq-fe.h>
 #endif
@@ -19,13 +24,22 @@
 
 namespace rdb {
 
+/**
+ * @brief Identifies which database backend a unified interface is using.
+ */
 enum class BackendType { SQLite, PostgreSQL, MySQL };
 
+/**
+ * @brief Exception raised by the backend-independent API.
+ */
 class UnifiedException : public std::runtime_error {
 public:
     explicit UnifiedException(const std::string& message) : std::runtime_error(message) {}
 };
 
+/**
+ * @brief Common interface for a prepared statement across database backends.
+ */
 class IStatement {
 public:
     virtual ~IStatement() {}
@@ -39,11 +53,21 @@ public:
     virtual double getDouble(int column) const = 0;
     virtual std::string getText(int column) const = 0;
 
+    /**
+     * @brief Iterates through every row in a result set.
+     * @param callback Function invoked for each row.
+     */
     void forEachRow(const std::function<void(IStatement&)>& callback) {
         while (step()) callback(*this);
         reset();
     }
 
+    /**
+     * @brief Maps each row to a typed result value.
+     * @tparam T Destination value type.
+     * @param mapper Conversion function for each row.
+     * @return Vector containing each mapped row.
+     */
     template<typename T>
     std::vector<T> mapRows(const std::function<T(IStatement&)>& mapper) {
         std::vector<T> rows;
@@ -52,8 +76,14 @@ public:
     }
 };
 
+/**
+ * @brief Common interface for a database connection independent of the backend.
+ */
 class IDatabase {
 public:
+    /**
+     * @brief RAII guard for transaction handling across backends.
+     */
     class Transaction {
         IDatabase& database_;
         bool active_;
@@ -70,6 +100,9 @@ public:
     virtual std::unique_ptr<IStatement> prepare(const std::string& sql) = 0;
 };
 
+/**
+ * @brief SQLite-backed implementation of the unified statement interface.
+ */
 class SQLiteUnifiedStatement : public IStatement {
     sqlite3_stmt* statement_;
 public:
@@ -99,6 +132,9 @@ private:
     static void check(int result) { if (result != SQLITE_OK) throw UnifiedException("SQLite bind failed"); }
 };
 
+/**
+ * @brief SQLite-backed implementation of the unified database interface.
+ */
 class SQLiteUnifiedDatabase : public IDatabase {
     sqlite3* database_;
 public:
@@ -122,6 +158,9 @@ public:
 };
 
 #if defined(RDB_ENABLE_POSTGRESQL)
+/**
+ * @brief PostgreSQL-backed prepared statement for the unified interface.
+ */
 class PostgreSQLUnifiedStatement : public IStatement {
     PGconn* connection_;
     std::string name_;
@@ -182,6 +221,9 @@ private:
     }
 };
 
+/**
+ * @brief PostgreSQL-backed implementation of the unified database interface.
+ */
 class PostgreSQLUnifiedDatabase : public IDatabase {
     PGconn* connection_;
     unsigned long statement_id_;
@@ -214,6 +256,9 @@ private:
 #endif
 
 #if defined(RDB_ENABLE_MYSQL)
+/**
+ * @brief MySQL-backed prepared statement for the unified interface.
+ */
 class MySQLUnifiedStatement : public IStatement {
     MYSQL_STMT* statement_;
     std::vector<std::string> values_;
@@ -273,6 +318,9 @@ private:
     }
 };
 
+/**
+ * @brief MySQL-backed implementation of the unified database interface.
+ */
 class MySQLUnifiedDatabase : public IDatabase {
     MYSQL* connection_;
 public:
@@ -291,6 +339,11 @@ public:
 };
 #endif
 
+/**
+ * @brief Creates a SQLite-backed unified database object.
+ * @param filename SQLite database file path.
+ * @return Database instance implementing IDatabase.
+ */
 inline std::unique_ptr<IDatabase> makeSQLiteDatabase(const std::string& filename) { return std::unique_ptr<IDatabase>(new SQLiteUnifiedDatabase(filename)); }
 #if defined(RDB_ENABLE_POSTGRESQL)
 inline std::unique_ptr<IDatabase> makePostgreSQLDatabase(const std::string& conninfo) { return std::unique_ptr<IDatabase>(new PostgreSQLUnifiedDatabase(conninfo)); }

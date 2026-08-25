@@ -1,16 +1,31 @@
+/**
+ * @file example.cpp
+ * @brief Demonstrates the modern RAII-based SQLite API with transactions and row mapping.
+ */
+
 #include "include/rdb.h"
 #include <iostream>
 
+/**
+ * @brief Simple record used to map query results into a C++ struct.
+ */
 struct Player {
     int id;
     std::string name;
 };
 
+/**
+ * @brief Example ship model used for demonstration purposes.
+ */
 struct Ship {
     int id;
     std::string type;
 };
 
+/**
+ * @brief Runs the example program.
+ * @return 0 on success, non-zero on failure.
+ */
 int main() {
     try {
         rdb::Database db("fleet.db");

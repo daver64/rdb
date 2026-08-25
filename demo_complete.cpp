@@ -1,13 +1,25 @@
+/**
+ * @file demo_complete.cpp
+ * @brief Comprehensive demonstration of the PHP-like database API with schema setup and queries.
+ */
+
 #include "include/rdb.h"
 #include <iostream>
 #include <iomanip>
 
 using namespace rdb;
 
+/**
+ * @brief Prints a divider used to format console output in the demo.
+ */
 void printSeparator() {
     std::cout << std::string(60, '-') << std::endl;
 }
 
+/**
+ * @brief Runs the full feature demo for the library.
+ * @return 0 on success.
+ */
 int main() {
     std::cout << "RDB - Complete PHP-like API Demo" << std::endl;
     printSeparator();

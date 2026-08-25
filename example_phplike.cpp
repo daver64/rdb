@@ -1,8 +1,17 @@
+/**
+ * @file example_phplike.cpp
+ * @brief Demonstrates the PHP-style DBConnect API and its compatibility helpers.
+ */
+
 #include "include/rdb.h"
 #include <iostream>
 
 using namespace rdb;
 
+/**
+ * @brief Runs a brief example of the PHP-like database wrapper.
+ * @return 0 when the example completes successfully.
+ */
 int main() {
     std::cout << "=== PHP-like API Example ===" << std::endl;
     
