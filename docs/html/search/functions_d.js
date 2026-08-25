@@ -1,0 +1,15 @@
+var searchData=
+[
+  ['size_0',['size',['../classSQLResults.html#a83da044e8e417a87365f14e9b31df0da',1,'SQLResults::size()'],['../classrdb_1_1SQLResults.html#a3fd64ab3c91bff20aa8c13f982b03883',1,'rdb::SQLResults::size()']]],
+  ['sql_5fescape_1',['sql_escape',['../sqlitemodule_8h.html#a157d16c75bc5be0d3d84bfd5d240d1f6',1,'sql_escape(const std::string &amp;src):&#160;sl_sqlite3.cpp'],['../sl__sqlite3_8cpp.html#a157d16c75bc5be0d3d84bfd5d240d1f6',1,'sql_escape(const std::string &amp;src):&#160;sl_sqlite3.cpp'],['../namespacerdb.html#ac3e583790fd771115635a3a71131dc7a',1,'rdb::sql_escape()']]],
+  ['sql_5fescape_5fcppstring_2',['sql_escape_cppstring',['../sqlitemodule_8h.html#a43dd6e76a9a91e55416a0bfab0a85b1e',1,'sql_escape_cppstring(const std::string &amp;src, std::string *result):&#160;sl_sqlite3.cpp'],['../sl__sqlite3_8cpp.html#a43dd6e76a9a91e55416a0bfab0a85b1e',1,'sql_escape_cppstring(const std::string &amp;src, std::string *result):&#160;sl_sqlite3.cpp']]],
+  ['sql_5fescape_5fstring_3',['sql_escape_string',['../sqlitemodule_8h.html#a0305c92a571fbe378288a30b5d22744b',1,'sql_escape_string(const char *src, char *dst):&#160;sl_sqlite3.cpp'],['../sl__sqlite3_8cpp.html#a0305c92a571fbe378288a30b5d22744b',1,'sql_escape_string(const char *src, char *dst):&#160;sl_sqlite3.cpp']]],
+  ['sqlite3db_4',['SQLite3DB',['../classSQLite3DB.html#adcd27c1fdbd03c4f7fe6426d58926d4a',1,'SQLite3DB']]],
+  ['sqliteexception_5',['SQLiteException',['../classrdb_1_1SQLiteException.html#a911e24e12d25d157717eb55b96d884d2',1,'rdb::SQLiteException']]],
+  ['sqliteunifieddatabase_6',['SQLiteUnifiedDatabase',['../classrdb_1_1SQLiteUnifiedDatabase.html#aa4b8e02e2d1c28e0aae32546919b77a5',1,'rdb::SQLiteUnifiedDatabase']]],
+  ['sqliteunifiedstatement_7',['SQLiteUnifiedStatement',['../classrdb_1_1SQLiteUnifiedStatement.html#a724b62dbe301d41e3d44a45ab5c03e44',1,'rdb::SQLiteUnifiedStatement']]],
+  ['sqlresults_8',['sqlresults',['../classSQLResults.html#a67b39880991caf75265af29aff2e7137',1,'SQLResults::SQLResults()'],['../classrdb_1_1SQLResults.html#ac7bca9ff2f193a63b5f23e38b54562e7',1,'rdb::SQLResults::SQLResults()']]],
+  ['statement_9',['statement',['../classrdb_1_1Statement.html#a4bb5b89b9f47d2b78abd92a37e2a5da3',1,'rdb::Statement::Statement(sqlite3 *db, const std::string &amp;sql)'],['../classrdb_1_1Statement.html#a92999c8d1af7f016d8ba8d2c3adc7a2e',1,'rdb::Statement::Statement(const Statement &amp;)=delete'],['../classrdb_1_1Statement.html#a3e89601b34fb217177dbda60598cb483',1,'rdb::Statement::Statement(Statement &amp;&amp;other) noexcept']]],
+  ['statement_3a_3acolumn_3c_20std_3a_3astring_20_3e_10',['column&lt; std::string &gt;',['../namespacerdb.html#a40a9315e213c693930214b00f2972299',1,'rdb']]],
+  ['step_11',['step',['../classrdb_1_1SQLiteUnifiedStatement.html#aa112677ae190df69e24769959e5636f5',1,'rdb::SQLiteUnifiedStatement::step()'],['../classrdb_1_1IStatement.html#ace07d5ad646955b59ab09f5cecb7525f',1,'rdb::IStatement::step()'],['../classrdb_1_1Statement.html#abcf0db9ebdbe10b432d7d5155fccb35d',1,'rdb::Statement::step()']]]
+];
